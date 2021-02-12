@@ -5,7 +5,7 @@
  * found at http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-import React, { createRef } from 'react';
+import React, { useState, createRef } from 'react';
 import { render, renderRtl, fireEvent, screen } from 'garden-test-utils';
 import { ColorPicker } from './index';
 import { IColor } from '../../utils/types';
@@ -128,7 +128,7 @@ describe('ColorPicker', () => {
       expect(hexInput.value).toBe('#e8494d');
     });
 
-    it('updates the color picker when the input is changed to a valid hex without the number sign', () => {
+    it('resets the hex input to the last valid hex string', () => {
       render(<ColorPicker defaultColor="rgb(23, 73, 77)" />);
       const previewBox = screen.getByTestId('preview-box');
       const colorWellThumb = screen.getByTestId('colorwell-thumb');
@@ -140,6 +140,7 @@ describe('ColorPicker', () => {
 
       expect(previewBox).toHaveAttribute('style', 'background-color: rgb(23, 73, 77);');
       expect(hueSlider.value).toBe('184.44444444444443');
+      expect(hexInput.value).toBe('#17494d');
       expect(redInput.value).toBe('23');
       expect(greenInput.value).toBe('73');
       expect(blueInput.value).toBe('77');
@@ -149,16 +150,18 @@ describe('ColorPicker', () => {
       );
 
       userEvent.clear(hexInput);
-      userEvent.type(hexInput, 'b4da55');
+      userEvent.type(hexInput, 'b4!a55');
       userEvent.tab();
 
-      expect(previewBox).toHaveAttribute('style', 'background-color: rgb(180, 218, 85);');
-      expect(hueSlider.value).toBe('77');
-      expect(hexInput.value).toBe('#b4da55');
-      expect(redInput.value).toBe('180');
-      expect(greenInput.value).toBe('218');
-      expect(blueInput.value).toBe('85');
-      expect(colorWellThumb).toHaveAttribute('style', 'top: 15%; left: 60.99999999999998%;');
+      expect(previewBox).toHaveAttribute('style', 'background-color: rgb(23, 73, 77);');
+      expect(hueSlider.value).toBe('184.44444444444443');
+      expect(redInput.value).toBe('23');
+      expect(greenInput.value).toBe('73');
+      expect(blueInput.value).toBe('77');
+      expect(colorWellThumb).toHaveAttribute(
+        'style',
+        'top: 69.80392156862746%; left: 70.12987012987013%;'
+      );
     });
 
     it('updates the color picker when the hex input is changed', () => {
@@ -293,19 +296,19 @@ describe('ColorPicker', () => {
 
       userEvent.clear(redInput);
       userEvent.type(redInput, '299');
-      expect(redInput.value).toBe('29');
+      expect(redInput.value).toBe('255');
 
       userEvent.clear(greenInput);
       userEvent.type(greenInput, '299');
-      expect(greenInput.value).toBe('29');
+      expect(greenInput.value).toBe('255');
 
       userEvent.clear(blueInput);
       userEvent.type(blueInput, '299');
-      expect(blueInput.value).toBe('29');
+      expect(blueInput.value).toBe('255');
 
       userEvent.clear(alphaInput);
       userEvent.type(alphaInput, '109');
-      expect(alphaInput.value).toBe('10');
+      expect(alphaInput.value).toBe('100');
     });
 
     it('updates the color only if the hex input is a valid hex color', () => {
@@ -336,7 +339,7 @@ describe('ColorPicker', () => {
   describe('Controlled usage', () => {
     it('updates the color picker when the hue slider is changed', () => {
       const Basic = () => {
-        const [color, setColor] = React.useState<string | IColor>('#17494D');
+        const [color, setColor] = useState<string | IColor>('#17494D');
 
         return <ColorPicker color={color} onChange={setColor} />;
       };
@@ -368,7 +371,7 @@ describe('ColorPicker', () => {
 
     it('updates the color picker when the alpha slider is changed', () => {
       const Basic = () => {
-        const [color, setColor] = React.useState<any>('rgb(23,73,77)');
+        const [color, setColor] = useState<string | IColor>('rgb(23,73,77)');
 
         return <ColorPicker color={color} onChange={setColor} />;
       };
@@ -389,7 +392,7 @@ describe('ColorPicker', () => {
 
     it('updates the rgb/a inputs correctly when one is cleared and user types into another', () => {
       const Basic = () => {
-        const [color, setColor] = React.useState<any>('rgb(23,73,77)');
+        const [color, setColor] = useState<string | IColor>('rgb(23,73,77)');
 
         return <ColorPicker color={color} onChange={setColor} />;
       };
@@ -421,9 +424,9 @@ describe('ColorPicker', () => {
       expect(hexInput.value).toBe('#e8494d');
     });
 
-    it('updates the color picker when the input is changed to a valid hex without the number sign', () => {
+    it('resets the hex input to the last valid hex string', () => {
       const Basic = () => {
-        const [color, setColor] = React.useState<any>('rgb(23,73,77)');
+        const [color, setColor] = useState<string | IColor>('rgb(23,73,77)');
 
         return <ColorPicker color={color} onChange={setColor} />;
       };
@@ -449,24 +452,23 @@ describe('ColorPicker', () => {
       );
 
       userEvent.clear(hexInput);
-      userEvent.type(hexInput, 'b4da55');
+      userEvent.type(hexInput, 'b4a!a55');
       userEvent.tab();
 
-      expect(previewBox).toHaveAttribute('style', 'background-color: rgb(180, 218, 85);');
-      expect(hueSlider.value).toBe('77');
-      expect(hexInput.value).toBe('#b4da55');
-      expect(redInput.value).toBe('180');
-      expect(greenInput.value).toBe('218');
-      expect(blueInput.value).toBe('85');
+      expect(previewBox).toHaveAttribute('style', 'background-color: rgb(23, 73, 77);');
+      expect(hueSlider.value).toBe('184.44444444444443');
+      expect(redInput.value).toBe('23');
+      expect(greenInput.value).toBe('73');
+      expect(blueInput.value).toBe('77');
       expect(colorWellThumb).toHaveAttribute(
         'style',
-        'top: 14.509803921568633%; left: 61.00917431192659%;'
+        'top: 69.80392156862746%; left: 70.12987012987013%;'
       );
     });
 
     it('updates the color picker when the hex input is changed', () => {
       const Basic = () => {
-        const [color, setColor] = React.useState<any>('rgb(23,73,77)');
+        const [color, setColor] = useState<string | IColor>('rgb(23,73,77)');
 
         return <ColorPicker color={color} onChange={setColor} />;
       };
@@ -499,15 +501,12 @@ describe('ColorPicker', () => {
       expect(redInput.value).toBe('180');
       expect(greenInput.value).toBe('218');
       expect(blueInput.value).toBe('85');
-      expect(colorWellThumb).toHaveAttribute(
-        'style',
-        'top: 14.509803921568633%; left: 61.00917431192659%;'
-      );
+      expect(colorWellThumb).toHaveAttribute('style', 'top: 15%; left: 60.99999999999998%;');
     });
 
     it('updates the color picker when the R input is changed', () => {
       const Basic = () => {
-        const [color, setColor] = React.useState<any>('rgb(23,73,77)');
+        const [color, setColor] = useState<string | IColor>('rgb(23,73,77)');
 
         return <ColorPicker color={color} onChange={setColor} />;
       };
@@ -533,12 +532,12 @@ describe('ColorPicker', () => {
 
       expect(previewBox).toHaveAttribute('style', 'background-color: rgb(255, 73, 77);');
       expect(hueSlider.value).toBe('359');
-      expect(colorWellThumb).toHaveAttribute('style', 'top: 0%; left: 71.37254901960785%;');
+      expect(colorWellThumb).toHaveAttribute('style', 'top: 0%; left: 71%;');
     });
 
     it('updates the color picker when the G input is changed', () => {
       const Basic = () => {
-        const [color, setColor] = React.useState<any>('rgb(23,73,77)');
+        const [color, setColor] = useState<string | IColor>('rgb(23,73,77)');
 
         return <ColorPicker color={color} onChange={setColor} />;
       };
@@ -564,12 +563,12 @@ describe('ColorPicker', () => {
 
       expect(previewBox).toHaveAttribute('style', 'background-color: rgb(23, 255, 77);');
       expect(hueSlider.value).toBe('134');
-      expect(colorWellThumb).toHaveAttribute('style', 'top: 0%; left: 90.98039215686275%;');
+      expect(colorWellThumb).toHaveAttribute('style', 'top: 0%; left: 91%;');
     });
 
     it('updates the color picker when the B input is changed', () => {
       const Basic = () => {
-        const [color, setColor] = React.useState<any>('rgb(23,73,77)');
+        const [color, setColor] = useState<string | IColor>('rgb(23,73,77)');
 
         return <ColorPicker color={color} onChange={setColor} />;
       };
@@ -595,17 +594,12 @@ describe('ColorPicker', () => {
 
       expect(previewBox).toHaveAttribute('style', 'background-color: rgb(23, 73, 255);');
       expect(hueSlider.value).toBe('227');
-      expect(colorWellThumb).toHaveAttribute('style', 'top: 0%; left: 90.98039215686275%;');
+      expect(colorWellThumb).toHaveAttribute('style', 'top: 0%; left: 91%;');
     });
 
     it('updates with correct alpha when the A input is changed', () => {
       const Basic = () => {
-        const [color, setColor] = React.useState<any>({
-          red: 23,
-          green: 73,
-          blue: 77,
-          alpha: 100
-        });
+        const [color, setColor] = useState<string | IColor>('rgba(23,73,77,1)');
 
         return <ColorPicker color={color} onChange={setColor} />;
       };
@@ -630,10 +624,11 @@ describe('ColorPicker', () => {
 
     it('keeps current color when user changes RGB/A inputs to invalid values', () => {
       const Basic = () => {
-        const [color, setColor] = React.useState<any>({
+        const [color, setColor] = useState<IColor>({
           hue: 0,
           saturation: 0,
           lightness: 0,
+          hex: '#02494d',
           red: 23,
           green: 73,
           blue: 77,
@@ -652,24 +647,24 @@ describe('ColorPicker', () => {
 
       userEvent.clear(redInput);
       userEvent.type(redInput, '299');
-      expect(redInput.value).toBe('29');
+      expect(redInput.value).toBe('255');
 
       userEvent.clear(greenInput);
       userEvent.type(greenInput, '299');
-      expect(greenInput.value).toBe('29');
+      expect(greenInput.value).toBe('255');
 
       userEvent.clear(blueInput);
       userEvent.type(blueInput, '299');
-      expect(blueInput.value).toBe('29');
+      expect(blueInput.value).toBe('255');
 
       userEvent.clear(alphaInput);
       userEvent.type(alphaInput, '109');
-      expect(alphaInput.value).toBe('10');
+      expect(alphaInput.value).toBe('100');
     });
 
     it('updates the color only if the hex input is a valid hex color', () => {
       const Basic = () => {
-        const [color, setColor] = React.useState<any>('#17494d');
+        const [color, setColor] = useState<string | IColor>('#17494d');
 
         return <ColorPicker color={color} onChange={setColor} />;
       };
@@ -694,15 +689,12 @@ describe('ColorPicker', () => {
       userEvent.type(hexInput, 'da55'); // now valid hex
 
       expect(hueSlider.value).toBe('77');
-      expect(colorWellThumb).toHaveAttribute(
-        'style',
-        'top: 14.509803921568633%; left: 61.00917431192659%;'
-      );
+      expect(colorWellThumb).toHaveAttribute('style', 'top: 15%; left: 60.99999999999998%;');
     });
 
     it('sets color picker text inputs when color prop is manually controlled', () => {
       const Basic = () => {
-        const [color, setColor] = React.useState<string | IColor>('#17494d');
+        const [color, setColor] = useState<string | IColor>('#17494d');
 
         return (
           <>
@@ -757,10 +749,10 @@ describe('ColorPicker', () => {
 
       userEvent.click(screen.getByText('Change #b!da5!'));
 
-      expect(hexInput.value).toBe('#ffffff');
-      expect(redInput.value).toBe('255');
-      expect(greenInput.value).toBe('255');
-      expect(blueInput.value).toBe('255');
+      expect(hexInput.value).toBe('#55d3da');
+      expect(redInput.value).toBe('85');
+      expect(greenInput.value).toBe('211');
+      expect(blueInput.value).toBe('218');
       expect(alphaInput.value).toBe('100');
     });
   });
